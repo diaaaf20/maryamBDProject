@@ -1,0 +1,627 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>For Maryam</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Quicksand:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --night-1: #150b2e;
+        --night-2: #2c1350;
+        --night-3: #4a1f6b;
+        --pink: #ff7aa8;
+        --gold: #ffd166;
+        --teal: #5fe0d0;
+        --lilac: #c9a4ff;
+        --coral: #ff9770;
+        --cream: #fdf6ee;
+        --text-soft: #f1e6ff;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: radial-gradient(
+          120% 90% at 50% 100%,
+          var(--night-3) 0%,
+          var(--night-2) 45%,
+          var(--night-1) 100%
+        );
+        font-family: "Quicksand", sans-serif;
+        color: var(--text-soft);
+      }
+
+      /* ---------- starfield ---------- */
+      #sky {
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+      }
+      .star {
+        position: absolute;
+        border-radius: 50%;
+        background: var(--cream);
+        animation: twinkle 3s ease-in-out infinite;
+      }
+      @keyframes twinkle {
+        0%,
+        100% {
+          opacity: 0.15;
+        }
+        50% {
+          opacity: 0.9;
+        }
+      }
+
+      /* ---------- screens ---------- */
+      .screen {
+        position: fixed;
+        inset: 0;
+        z-index: 2;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+        transition: opacity 0.7s ease;
+        padding: 6vh 6vw;
+      }
+      .screen.active {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+      }
+
+      .eyebrow {
+        font-family: "Quicksand", sans-serif;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+        color: var(--gold);
+        font-size: 0.95rem;
+        margin: 0 0 0.6em;
+      }
+
+      /* ---------- gate ---------- */
+      .gate-card {
+        max-width: 480px;
+      }
+      .gate-card h1 {
+        font-family: "Fraunces", serif;
+        font-weight: 600;
+        font-size: clamp(2.1rem, 5vw, 3.2rem);
+        margin: 0 0 1.4em;
+        line-height: 1.15;
+        color: var(--cream);
+      }
+      .gate-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+      button {
+        font-family: "Quicksand", sans-serif;
+        font-weight: 600;
+        font-size: 1rem;
+        padding: 0.85em 1.7em;
+        border-radius: 999px;
+        border: 1px solid transparent;
+        cursor: pointer;
+        transition:
+          transform 0.2s ease,
+          box-shadow 0.2s ease,
+          background 0.2s ease;
+      }
+      #yesBtn {
+        background: linear-gradient(135deg, var(--pink), var(--coral));
+        color: #2a0f22;
+        box-shadow: 0 6px 24px rgba(255, 122, 168, 0.35);
+      }
+      #yesBtn:hover {
+        transform: translateY(-2px) scale(1.03);
+        box-shadow: 0 10px 28px rgba(255, 122, 168, 0.5);
+      }
+      #noBtn {
+        background: transparent;
+        border-color: rgba(241, 230, 255, 0.35);
+        color: var(--text-soft);
+      }
+      #noBtn:hover {
+        border-color: var(--text-soft);
+        transform: translateY(-2px);
+      }
+
+      /* ---------- denied ---------- */
+      .denied-text {
+        font-family: "Fraunces", serif;
+        font-size: clamp(1.3rem, 3.6vw, 1.9rem);
+        line-height: 1.5;
+        color: var(--text-soft);
+        max-width: 560px;
+      }
+
+      /* ---------- party ---------- */
+      #party {
+        overflow: hidden;
+      }
+      .counter-pill {
+        position: fixed;
+        top: 5vh;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 5;
+        background: rgba(21, 11, 46, 0.55);
+        border: 1px solid rgba(255, 209, 102, 0.4);
+        color: var(--gold);
+        font-weight: 600;
+        letter-spacing: 0.02em;
+        padding: 0.55em 1.3em;
+        border-radius: 999px;
+        backdrop-filter: blur(6px);
+        font-size: 0.95rem;
+      }
+      #balloonLayer,
+      #finaleBalloonLayer {
+        position: fixed;
+        inset: 0;
+        z-index: 1;
+      }
+
+      /* ---------- balloons ---------- */
+      .balloon-wrap {
+        position: fixed;
+        bottom: -22vh;
+        transition-property: bottom;
+        transition-timing-function: cubic-bezier(0.25, 0.65, 0.35, 1);
+        cursor: pointer;
+        z-index: 3;
+      }
+      .balloon-wrap.popping .balloon-bob {
+        animation: none;
+      }
+      .balloon-wrap.popping {
+        animation: pop-scale 0.26s ease forwards;
+      }
+      @keyframes pop-scale {
+        to {
+          transform: scale(0.25);
+          opacity: 0;
+        }
+      }
+
+      .balloon-bob {
+        animation-name: bob;
+        animation-timing-function: ease-in-out;
+        animation-iteration-count: infinite;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      @keyframes bob {
+        0%,
+        100% {
+          transform: translate(0, 0) rotate(-3deg);
+        }
+        50% {
+          transform: translate(8px, -16px) rotate(3deg);
+        }
+      }
+
+      .balloon-body {
+        width: clamp(46px, 6.4vw, 76px);
+        aspect-ratio: 0.82;
+        border-radius: 50% 50% 46% 46% / 58% 58% 42% 42%;
+        background: radial-gradient(
+          circle at 32% 28%,
+          rgba(255, 255, 255, 0.55),
+          var(--balloon-color) 55%,
+          var(--balloon-color) 100%
+        );
+        background-color: var(--balloon-color);
+        position: relative;
+        box-shadow: 0 10px 22px rgba(0, 0, 0, 0.28);
+        transition:
+          transform 0.2s ease,
+          filter 0.2s ease;
+      }
+      .balloon-wrap:hover .balloon-body {
+        transform: scale(1.07);
+        filter: brightness(1.12);
+      }
+      .balloon-body .knot {
+        position: absolute;
+        left: 50%;
+        bottom: -8px;
+        transform: translateX(-50%);
+        width: 0;
+        height: 0;
+        border-left: 6px solid transparent;
+        border-right: 6px solid transparent;
+        border-top: 9px solid var(--balloon-color);
+      }
+      .string {
+        width: 2px;
+        height: clamp(50px, 9vh, 100px);
+        background: linear-gradient(
+          to bottom,
+          rgba(241, 230, 255, 0.55),
+          rgba(241, 230, 255, 0)
+        );
+        margin-top: 6px;
+      }
+
+      /* ---------- particles ---------- */
+      .particle {
+        position: fixed;
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: 6;
+        transform: translate(0, 0) scale(1);
+        animation: particle-burst 0.7s ease-out forwards;
+      }
+      @keyframes particle-burst {
+        to {
+          transform: translate(var(--dx), var(--dy)) scale(0);
+          opacity: 0;
+        }
+      }
+
+      .number-flash {
+        position: fixed;
+        top: 14vh;
+        left: 50%;
+        transform: translate(-50%, -50%) scale(0.5);
+        font-family: "Fraunces", serif;
+        font-size: 2.6rem;
+        color: var(--gold);
+        opacity: 0;
+        z-index: 6;
+        pointer-events: none;
+        animation: number-flash 0.9s ease forwards;
+      }
+      @keyframes number-flash {
+        0% {
+          transform: translate(-50%, -50%) scale(0.5);
+          opacity: 0;
+        }
+        22% {
+          transform: translate(-50%, -50%) scale(1.15);
+          opacity: 1;
+        }
+        75% {
+          opacity: 1;
+        }
+        100% {
+          transform: translate(-50%, -80%) scale(1);
+          opacity: 0;
+        }
+      }
+
+      /* ---------- finale ---------- */
+      #finale {
+        overflow: hidden;
+      }
+      .finale-card {
+        position: relative;
+        z-index: 4;
+        max-width: 600px;
+        background: rgba(21, 11, 46, 0.5);
+        border: 1px solid rgba(255, 209, 102, 0.35);
+        border-radius: 28px;
+        padding: clamp(2rem, 5vw, 3.2rem) clamp(1.6rem, 5vw, 3rem);
+        backdrop-filter: blur(8px);
+        animation: finale-in 1s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+      }
+      @keyframes finale-in {
+        from {
+          opacity: 0;
+          transform: translateY(24px) scale(0.96);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+      }
+      .finale-card h1 {
+        font-family: "Fraunces", serif;
+        font-weight: 700;
+        font-size: clamp(2.6rem, 7vw, 4.4rem);
+        margin: 0 0 0.5em;
+        color: var(--cream);
+        line-height: 1;
+      }
+      .finale-text {
+        font-size: clamp(1rem, 2.3vw, 1.15rem);
+        line-height: 1.7;
+        color: var(--text-soft);
+        margin: 0 0 1.4em;
+      }
+      .finale-sign {
+        font-family: "Fraunces", serif;
+        font-style: italic;
+        color: var(--gold);
+        font-size: 1.05rem;
+        margin: 0;
+      }
+
+      .hidden {
+        display: none !important;
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .balloon-bob {
+          animation-duration: 8s !important;
+        }
+        .star {
+          animation: none;
+          opacity: 0.6;
+        }
+        .finale-card {
+          animation: none;
+          opacity: 1;
+          transform: none;
+        }
+      }
+
+      @media (max-width: 520px) {
+        .gate-buttons {
+          flex-direction: column;
+          align-items: stretch;
+        }
+        .counter-pill {
+          top: 3.5vh;
+          font-size: 0.85rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="sky"></div>
+
+    <section id="gate" class="screen active">
+      <div class="gate-card">
+        <p class="eyebrow">something's waiting for you 🎈</p>
+        <h1>Are you Maryam?</h1>
+        <div class="gate-buttons">
+          <button id="yesBtn">Yes, that's me</button>
+          <button id="noBtn">No, someone else</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="denied" class="screen">
+      <p class="denied-text">
+        This website has been made for Maryam.<br />You are not welcomed here.
+      </p>
+    </section>
+
+    <section id="party" class="screen">
+      <div class="counter-pill" id="counterPill">0 / 17 balloons</div>
+      <div id="balloonLayer"></div>
+    </section>
+
+    <section id="finale" class="screen">
+      <div id="finaleBalloonLayer"></div>
+      <div class="finale-card">
+        <p class="eyebrow">🎈 seventeen balloons later</p>
+        <h1>Happy Birthday,<br />Maryam</h1>
+        <p class="finale-text">
+          Every single one of those balloons was for a memory, a laugh, or just
+          another reason I'm glad you exist. Watching you grow up has been one
+          of the best parts of my life, and today I just want you to feel
+          exactly how loved you are. I hope this year brings you everything
+          you're hoping for — and a few things you didn't even know to wish for.
+        </p>
+        <p class="finale-sign">With all my love, your brother 💛</p>
+      </div>
+    </section>
+
+    <script>
+      // ---------- starfield ----------
+      (function createStars() {
+        const sky = document.getElementById("sky");
+        const frag = document.createDocumentFragment();
+        for (let i = 0; i < 80; i++) {
+          const s = document.createElement("span");
+          s.className = "star";
+          s.style.left = Math.random() * 100 + "%";
+          s.style.top = Math.random() * 70 + "%";
+          const size = Math.random() * 2 + 1;
+          s.style.width = size + "px";
+          s.style.height = size + "px";
+          s.style.animationDelay = -Math.random() * 4 + "s";
+          s.style.animationDuration = 2 + Math.random() * 3 + "s";
+          frag.appendChild(s);
+        }
+        sky.appendChild(frag);
+      })();
+
+      // ---------- screen helpers ----------
+      const gate = document.getElementById("gate");
+      const denied = document.getElementById("denied");
+      const party = document.getElementById("party");
+      const finale = document.getElementById("finale");
+
+      function show(el) {
+        el.classList.add("active");
+      }
+      function hide(el) {
+        el.classList.remove("active");
+      }
+
+      document.getElementById("yesBtn").addEventListener("click", () => {
+        hide(gate);
+        show(party);
+        startParty();
+      });
+      document.getElementById("noBtn").addEventListener("click", () => {
+        hide(gate);
+        show(denied);
+      });
+
+      // ---------- balloons ----------
+      const TOTAL = 17;
+      const COLORS = [
+        "var(--pink)",
+        "var(--gold)",
+        "var(--teal)",
+        "var(--lilac)",
+        "var(--coral)",
+      ];
+      let popped = 0;
+      let colorIdx = 0;
+      let activeCount = 0;
+      let mainSpawnTimer = null;
+
+      const balloonLayer = document.getElementById("balloonLayer");
+      const finaleBalloonLayer = document.getElementById("finaleBalloonLayer");
+      const counterPill = document.getElementById("counterPill");
+
+      function spawnBalloon(container, decorative) {
+        const wrap = document.createElement("div");
+        wrap.className = "balloon-wrap";
+
+        const left = 6 + Math.random() * 84;
+        wrap.style.left = left + "%";
+
+        const hoverBottom = 74 + Math.random() * 12; // hover zone: ~74–86% up from bottom
+        const riseDuration = 6 + Math.random() * 3;
+        wrap.style.transitionDuration = riseDuration + "s";
+
+        const color = COLORS[colorIdx % COLORS.length];
+        colorIdx++;
+        wrap.style.setProperty("--balloon-color", color);
+
+        const bob = document.createElement("div");
+        bob.className = "balloon-bob";
+        bob.style.animationDelay = -Math.random() * 4 + "s";
+        bob.style.animationDuration = 3.4 + Math.random() * 1.6 + "s";
+
+        const string = document.createElement("div");
+        string.className = "string";
+
+        const body = document.createElement("div");
+        body.className = "balloon-body";
+        const knot = document.createElement("div");
+        knot.className = "knot";
+        const shine = document.createElement("div");
+        shine.style.cssText =
+          "position:absolute;top:14%;left:22%;width:34%;height:22%;background:rgba(255,255,255,.5);border-radius:50%;filter:blur(1px);";
+        body.appendChild(knot);
+        body.appendChild(shine);
+
+        bob.appendChild(body);
+        bob.appendChild(string);
+        wrap.appendChild(bob);
+        container.appendChild(wrap);
+
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            wrap.style.bottom = hoverBottom + "vh";
+          });
+        });
+
+        wrap.addEventListener("click", () => popBalloon(wrap, decorative));
+        activeCount++;
+      }
+
+      function spawnParticles(x, y, color) {
+        for (let i = 0; i < 14; i++) {
+          const p = document.createElement("span");
+          p.className = "particle";
+          const angle = Math.random() * Math.PI * 2;
+          const dist = 40 + Math.random() * 70;
+          p.style.setProperty("--dx", Math.cos(angle) * dist + "px");
+          p.style.setProperty("--dy", Math.sin(angle) * dist + "px");
+          p.style.left = x + "px";
+          p.style.top = y + "px";
+          p.style.background =
+            Math.random() > 0.5
+              ? color
+              : Math.random() > 0.5
+                ? "var(--gold)"
+                : "var(--cream)";
+          document.body.appendChild(p);
+          setTimeout(() => p.remove(), 760);
+        }
+      }
+
+      function flashNumber(n) {
+        const el = document.createElement("div");
+        el.className = "number-flash";
+        el.textContent = n;
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), 900);
+      }
+
+      function popBalloon(wrap, decorative) {
+        if (wrap.classList.contains("popping")) return;
+        const rect = wrap.getBoundingClientRect();
+        const cx = rect.left + rect.width / 2;
+        const cy = rect.top + rect.height / 2;
+        const color = wrap.style.getPropertyValue("--balloon-color");
+
+        spawnParticles(cx, cy, color);
+        wrap.classList.add("popping");
+        setTimeout(() => {
+          wrap.remove();
+          activeCount--;
+        }, 260);
+
+        if (!decorative) {
+          popped++;
+          counterPill.textContent = popped + " / " + TOTAL + " balloons";
+          flashNumber(popped);
+          if (popped >= TOTAL) {
+            clearInterval(mainSpawnTimer);
+            setTimeout(showFinale, 1000);
+          }
+        }
+      }
+
+      function startParty() {
+        for (let i = 0; i < 3; i++) {
+          setTimeout(() => spawnBalloon(balloonLayer, false), i * 350);
+        }
+        mainSpawnTimer = setInterval(() => {
+          if (popped < TOTAL && activeCount < 7) {
+            spawnBalloon(balloonLayer, false);
+          }
+        }, 850);
+      }
+
+      function showFinale() {
+        hide(party);
+        show(finale);
+        for (let i = 0; i < 5; i++) {
+          setTimeout(() => spawnBalloon(finaleBalloonLayer, true), i * 260);
+        }
+        setInterval(() => {
+          if (
+            finaleBalloonLayer.querySelectorAll(".balloon-wrap").length < 10
+          ) {
+            spawnBalloon(finaleBalloonLayer, true);
+          }
+        }, 1000);
+      }
+    </script>
+  </body>
+</html>
